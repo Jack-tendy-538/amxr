@@ -1,4 +1,4 @@
-"""
+﻿"""
 OpenStreetMap 路径规划模块（替代高德 API）
 完全开源免费，无调用次数限制，适用于学术研究。
 
@@ -33,6 +33,8 @@ locations = {
     'A': (25.808093, 112.271926),   # 新圩镇
     'B': (25.73685,  112.2431),     # 石羊镇
     'C': (25.904305, 112.203287),   # 金陵镇
+    'D': (25.90751,112.19782),  # 新田县政府
+    'E': (25.905820,112.207372)  # 新田县文体中心
 }
 
 # ==================== 路网管理器（支持多种出行方式） ====================
@@ -198,14 +200,14 @@ def fetch_route_data(api_key_ignored, start_coords, end_coords, transport_mode, 
 def search_dimension1(output_file='Dimension-1.csv'):
     """
     相同出行方式（驾车），不同起点终点间的通行成本比较。
-    计算 A→B, B→C, A→C 三条路线。
+    计算 A→B, B→C, A→C, A→D, A→E, B→D, B→E, C→D, C→E, D→E 共10条路线。
     """
     print("\n🔍 开始维度1数据采集（驾车）...")
     # 预创建驾车导航器，避免重复下载
     nav_drive = OSMNavigator(place_name="新田县, 永州市, 湖南省, 中国", network_type='drive')
 
     # 定义要计算的配对
-    pairs = [('A', 'B'), ('B', 'C'), ('A', 'C')]
+    pairs = [('A', 'B'), ('B', 'C'), ('A', 'C'),('A','D'),('A','E'),('B','D'),('B','E'),('C','D'),('C','E'),('D','E')]
     for start_key, end_key in pairs:
         start_coords = locations[start_key]
         end_coords = locations[end_key]
@@ -266,9 +268,9 @@ def main():
     print("OSMnx 路径规划分析（基于 OpenStreetMap）")
     print("=" * 60)
     # 维度1：驾车路线
-    search_dimension1('Dimension-1.csv')
+    search_dimension1('data/works/Dimension-1.csv')
     # 维度3：不同交通工具
-    search_dimension3('Dimension-3.csv')
+    search_dimension3('data/works/Dimension-3.csv')
     print("\n🎉 所有数据采集完成！")
 
 if __name__ == "__main__":
