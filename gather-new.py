@@ -207,11 +207,12 @@ def search_dimension1(output_file='Dimension-1.csv'):
     nav_drive = OSMNavigator(place_name="新田县, 永州市, 湖南省, 中国", network_type='drive')
 
     # 定义要计算的配对
-    pairs = [('A', 'B'), ('B', 'C'), ('A', 'C'),('A','D'),('A','E'),('B','D'),('B','E'),('C','D'),('C','E'),('D','E')]
-    for start_key, end_key in pairs:
-        start_coords = locations[start_key]
-        end_coords = locations[end_key]
-        print(f"  正在计算 {start_key} → {end_key} ...")
+    # pairs = [('A', 'B'), ('B', 'C'), ('A', 'C'),('A','D'),('A','E'),('B','D'),('B','E'),('C','D'),('C','E'),('D','E')]
+    farm = (112.25664, 25.94996)
+    for end in locations.values():
+        start_coords = farm
+        end_coords = end
+        # print(f"  正在计算 {start_key} → {end_key} ...")
         route = nav_drive.get_route(start_coords[0], start_coords[1],
                                     end_coords[0], end_coords[1])
         if route:
@@ -235,8 +236,8 @@ def search_dimension3(output_file='Dimension-3.csv'):
     """
     print("\n🔍 开始维度3数据采集（A→B，多种方式）...")
     # 为每种出行方式单独创建导航器
-    start_coords = locations['A']
-    end_coords = locations['B']
+    start_coords = (25.808093, 112.271926)
+    end_coords = (112.25664, 25.94996)
     modes = ['驾车', '骑行', '步行']
     for mode in modes:
         print(f"  正在计算 {mode} 路线...")
@@ -268,7 +269,7 @@ def main():
     print("OSMnx 路径规划分析（基于 OpenStreetMap）")
     print("=" * 60)
     # 维度1：驾车路线
-    search_dimension1('data/works/Dimension-1.csv')
+    # search_dimension1('data/works/Dimension-1.csv')
     # 维度3：不同交通工具
     search_dimension3('data/works/Dimension-3.csv')
     print("\n🎉 所有数据采集完成！")
