@@ -65,17 +65,6 @@ class OSMNavigator:
         return ox.distance.nearest_nodes(self.graph, lon, lat)
 
     def get_route(self, start_lat, start_lon, end_lat, end_lon, weight='length', avg_speed_kmh=None):
-        """
-        计算两点间最短路径
-
-        参数：
-            start_lat, start_lon: 起点坐标
-            end_lat, end_lon: 终点坐标
-            weight: 最短路径权重（'length' 按距离，'travel_time' 按时间）
-            avg_speed_kmh: 平均速度（km/h），用于时间估算。若不指定则根据网络类型自动设置。
-        返回：
-            dict: 包含距离（米）、时间（秒）、路径节点列表等
-        """
         # 获取最近节点
         start_node = self.get_closest_node(start_lat, start_lon)
         end_node = self.get_closest_node(end_lat, end_lon)
@@ -92,32 +81,42 @@ class OSMNavigator:
             print(f"❌ 未找到可达路径：({start_lat},{start_lon}) -> ({end_lat},{end_lon})")
             return None
 
-        # 计算总距离和总时间
         total_dist_m = 0.0
-        # 若未指定速度，根据出行方式设置默认值
         if avg_speed_kmh is None:
             speed_map = {'drive': 30, 'bike': 15, 'walk': 5}
             avg_speed_kmh = speed_map.get(self.network_type, 10)
         speed_ms = avg_speed_kmh / 3.6
+
+        surfaces = []
+        smoothnesses = []
 
         for i in range(len(route_nodes) - 1):
             u = route_nodes[i]
             v = route_nodes[i + 1]
             edge_data = self.graph_proj.get_edge_data(u, v)
             if edge_data:
-                # 取第一条边（若有多条平行边，长度最小的那条）
                 first_edge = list(edge_data.values())[0]
                 dist = first_edge.get('length', 0)
                 total_dist_m += dist
+                surfaces.append(first_edge.get('surface', 'unknown'))
+                smoothnesses.append(first_edge.get('smoothness', 'unknown'))
 
         total_time_s = total_dist_m / speed_ms if speed_ms > 0 else 0
+
+        from collections import Counter
+        surface_stat = Counter(surfaces)
+        most_surface = surface_stat.most_common(1)[0][0] if surface_stat else 'unknown'
 
         return {
             'distance_meters': total_dist_m,
             'distance_km': total_dist_m / 1000.0,
             'duration_seconds': total_time_s,
             'duration_minutes': total_time_s / 60.0,
-            'route_nodes': route_nodes
+            'route_nodes': route_nodes,
+            'surfaces': surfaces,
+            'surface_stat': dict(surface_stat),
+            'main_surface': most_surface,
+            'smoothnesses': smoothnesses
         }
 
 # ==================== 成本计算函数 ====================
