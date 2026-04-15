@@ -1,7 +1,5 @@
-# GitHub Codespaces ♥️ Jupyter Notebooks
+这是我们数学建模用到的全部代码，包括数据采集、处理与决策。
 
-Welcome to your shiny new codespace! We've got everything fired up and running for you to explore Python and Jupyter notebooks.
+贡献者：@Jack-tendy-538 与 @Zhiripengniao
 
-You've got a blank canvas to work on from a git perspective as well. There's a single initial commit with what you're seeing right now - where you go from here is up to you!
-
-Everything you do here is contained within this one codespace. There is no repository on GitHub yet. If and when you’re ready you can click "Publish Branch" and we’ll create your repository and push up your project. If you were just exploring then and have no further need for this code then you can simply delete your codespace and it's gone forever.
+本仓库所有代码版权移交至北京师范大学数学科学学院数学建模教育中心。

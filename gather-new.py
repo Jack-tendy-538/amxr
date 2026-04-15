@@ -34,7 +34,7 @@ locations = {
     'B': (25.73685,  112.2431),     # 石羊镇
     'C': (25.904305, 112.203287),   # 金陵镇
     'D': (25.90751,112.19782),  # 新田县政府
-    'E': (25.905820,112.207372)  # 新田县文体中心
+    'E': (25.905820,112.207372)  # 新田县枧头镇
 }
 
 # ==================== 路网管理器（支持多种出行方式） ====================
@@ -258,6 +258,39 @@ def search_dimension3(output_file='Dimension-3.csv'):
             write_to_csv(output_file, row, fieldnames)
     print(f"✅ 维度3数据已保存至 {output_file}")
 
+# ==================== 获取A,B,C,D,E及农场坐标间的综合成本，输出到综合成本表（Dimension-comprehensive.csv） ====================
+def search_dimension_comprehensive(output_file='data/works/Dimension-comprehensive.csv'):
+    """
+    获取A,B,C,D,E及农场坐标间的综合成本，输出到综合成本表（Dimension-comprehensive.csv）
+    包含所有点对之间的驾车、骑行、步行成本比较。
+    """
+    print("\n🔍 开始综合成本数据采集（所有点对，多种方式）...")
+    points = {**locations, 'Farm': (112.25664, 25.94996)}
+    modes = ['驾车', '骑行', '步行']
+    for start_key, start_coords in points.items():
+        for end_key, end_coords in points.items():
+            if start_key == end_key:
+                continue
+            for mode in modes:
+                print(f"  正在计算 {mode} 路线：{start_key} → {end_key} ...")
+                osm_mode = {'驾车': 'drive', '骑行': 'bike', '步行': 'walk'}[mode]
+                nav = OSMNavigator(place_name="新田县, 永州市, 湖南省, 中国", network_type=osm_mode)
+                route = nav.get_route(start_coords[0], start_coords[1],
+                                      end_coords[0], end_coords[1])
+                if route:
+                    cost = compute_cost(route['distance_km'], mode)
+                    row = {
+                        'start': f"{start_coords[0]},{start_coords[1]}",
+                        'destination': f"{end_coords[0]},{end_coords[1]}",
+                        'transport_mode': mode,
+                        'distance': route['distance_meters'],
+                        'duration': route['duration_seconds'],
+                        'cost': cost
+                    }
+                    fieldnames = ['start', 'destination', 'transport_mode', 'distance', 'duration', 'cost']
+                    write_to_csv(output_file, row, fieldnames)
+    print(f"✅ 综合成本数据已保存至 {output_file}")
+
 # ==================== 主程序 ====================
 def main():
     """
@@ -270,7 +303,8 @@ def main():
     # 维度1：驾车路线
     # search_dimension1('data/works/Dimension-1.csv')
     # 维度3：不同交通工具
-    search_dimension3('data/works/Dimension-3.csv')
+    # search_dimension3('data/works/Dimension-3.csv')
+    search_dimension_comprehensive('data/works/Dimension-comprehensive.csv')
     print("\n🎉 所有数据采集完成！")
 
 if __name__ == "__main__":
